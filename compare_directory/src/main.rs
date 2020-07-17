@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::ffi::OsString;
 
 fn scan(path:PathBuf) -> io::Result<Vec<PathBuf>> {
-    let mut entr = fs::read_dir(&path)?
+    let entr = fs::read_dir(&path)?
         .map(|res|res.map(|e|e.path()))
         .collect::<Result<Vec<_>,io::Error>>()?;
 
@@ -18,6 +18,18 @@ fn change(a:io::Result<Vec<PathBuf>>) -> Vec<String>{
             .collect::<Result<_,_>>()
             .unwrap();
 a
+}
+fn get_size(a:&io::Result<Vec<PathBuf>>) ->Vec<u64>{
+    let a = a.as_ref().unwrap();
+    let mut z = Vec::new();
+    for (i,j) in a.iter().enumerate(){
+        let b = &a[i];
+        let b = fs::metadata(b)
+            .expect("could not get metadata");
+        let b = b.len();
+        z.push(b);
+    }
+z    
 }
 fn do_match<T: PartialEq>(a: &Vec<T>, b: &Vec<T>) -> bool{
     let matching = a
@@ -47,10 +59,12 @@ fn check(a: &[String], b: &[String]) -> Vec<String>{
     }
 c
         }
-fn started(a:PathBuf) -> Vec<String> {
+fn started() -> (Vec<String>,Vec<u64>) {
+    let a = read();
     let a = scan(a);
+    let a_size = get_size(&a);
     let a = change(a);
-    a
+    (a,a_size)
 }
 fn read() -> PathBuf{
     let mut a = String::new();
@@ -61,11 +75,13 @@ fn read() -> PathBuf{
 a
 }
 fn main(){
+    let buf1 = started();
+    let buf2 = started();
+    let path1 = buf1.0;
+    let path1_size = buf1.1;
+    let path2 = buf2.0;
+    let path2_size = buf2.1;
 
-    let path1 = read();
-    let path2 = read();
-    let path1 = started(path1);
-    let path2 = started(path2);
     let sum = do_match(&path1,&path2);
     let mut result = Vec::new();
     match sum {
