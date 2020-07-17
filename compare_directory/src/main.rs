@@ -39,6 +39,11 @@ fn do_match<T: PartialEq>(a: &Vec<T>, b: &Vec<T>) -> bool{
         .count();
     matching == a.len() && matching == b.len()
 }
+fn matching<T:PartialEq,U:PartialEq>(a:&Vec<T>, b:&Vec<T>,c:&Vec<U>,d:&Vec<U>) -> bool{
+    let q = do_match(a, b);
+    let p = do_match(c, d);
+    q && p 
+}
 fn check(a: &[String], b: &[String]) -> Vec<String>{
    let mut c:Vec<String> = a
        .iter()
@@ -82,12 +87,12 @@ fn main(){
     let path2 = buf2.0;
     let path2_size = buf2.1;
 
-    let sum = do_match(&path1,&path2);
-    let mut result = Vec::new();
+    let sum = matching(&path1,&path2,&path1_size,&path2_size);
     match sum {
-        true => println!("same"),
-        false => result= check(&path1,&path2),
-        _=> panic!("what makes something bad"),
-    }
-    println!("{:?}",result);
+        true => println!("it is same"),
+        false => {
+            let result = check(&path1,&path2);
+            println!("{:?}",result)
+        },
+    };
 }
