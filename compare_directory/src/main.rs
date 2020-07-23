@@ -1,15 +1,16 @@
 use std::{fs,io};
 use std::path::PathBuf;
 use std::ffi::OsString;
+use std::io::Result as IOResult;
 
-fn scan(path:PathBuf) -> io::Result<Vec<PathBuf>> {
+fn scan(path:PathBuf) -> IOResult<Vec<PathBuf>> {
     let entr = fs::read_dir(&path)?
         .map(|res|res.map(|e|e.path()))
         .collect::<Result<Vec<_>,io::Error>>()?;
 
     Ok(entr)
 }
-fn change(a:io::Result<Vec<PathBuf>>) -> Vec<String>{
+fn change(a:IOResult<Vec<PathBuf>>) -> Vec<String>{
     let a = a
             .unwrap()
             .into_iter()
@@ -19,7 +20,7 @@ fn change(a:io::Result<Vec<PathBuf>>) -> Vec<String>{
             .unwrap();
 a
 }
-fn get_size(a:&io::Result<Vec<PathBuf>>) ->Vec<u64>{
+fn get_size(a:&IOResult<Vec<PathBuf>>) ->Vec<u64>{
     let a = a.as_ref().unwrap();
     let mut z = Vec::new();
     for (i,j) in a.iter().enumerate(){
@@ -44,7 +45,16 @@ fn matching<T:PartialEq,U:PartialEq>(a:&Vec<T>, b:&Vec<T>,c:&Vec<U>,d:&Vec<U>) -
     let p = do_match(c, d);
     q && p 
 }
-fn check(a: &[String], b: &[String]) -> Vec<String>{
+fn checking(a:&Vec<String>,b:&Vec<String>,c:&Vec<u64>,d:&Vec<u64>) {
+   let x = check1(a,b);
+   if x.len() ==0 {
+       let y = check2(c,d);
+       if y.len() ==0 {
+           println!("it is same");
+       }
+   }
+}
+fn check1(a: &[String], b: &[String]) -> Vec<String>{
    let mut c:Vec<String> = a
        .iter()
        .chain(b.iter())
@@ -64,6 +74,25 @@ fn check(a: &[String], b: &[String]) -> Vec<String>{
     }
 c
         }
+fn check2(a:&[u64],b:&[u64]) ->Vec<u64> {
+    let mut c:Vec<u64> = a 
+        .iter()
+        .chain(b.iter())
+        .cloned()
+        .collect();
+
+    let mut i = 0;
+    while let Some(s) = c.get(i){
+        i+=1;
+        if c[i..].contains(s){
+            let s = s.clone();
+            c.retain(|x| x!= &s);
+            i-=1;
+        }
+    }
+c
+}
+
 fn started() -> (Vec<String>,Vec<u64>) {
     let a = read();
     let a = scan(a);
@@ -91,8 +120,8 @@ fn main(){
     match sum {
         true => println!("it is same"),
         false => {
-            let result = check(&path1,&path2);
-            println!("{:?}",result)
+            let result = checking(&path1,&path2,&path1_size,&path2_size);
+            println!("{:?}",result);
         },
     };
 }
