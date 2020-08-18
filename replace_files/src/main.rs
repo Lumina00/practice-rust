@@ -1,6 +1,5 @@
 use std::{fs,io};
 use std::path::PathBuf;
-use std::ffi::OsString;
 
 fn replace(a:PathBuf,b:PathBuf) {
     let mut temp = b
@@ -8,18 +7,16 @@ fn replace(a:PathBuf,b:PathBuf) {
         .into_os_string()
         .into_string()
         .unwrap();
-    temp.push_str("wt");
+    temp.push_str(".tmp");
     let temp = PathBuf::from(temp);
-    println!("{:?} {:?}",&a.display(),&b.display());
-    println!("{}",&temp.display());
     fs::copy(&a,&temp)
-        .expect("error 1");
+        .expect("Permission Denied");
     fs::remove_file(&a)
-        .expect("error 2");
+        .expect("Permission Denied");
     fs::copy(&b,&a)
-        .expect("error 3");
+        .expect("Permission Denied");
     fs::rename(&temp,&a)
-        .expect("error 4");
+        .expect("Permission Denied");
     
 }
 fn read() -> PathBuf{
