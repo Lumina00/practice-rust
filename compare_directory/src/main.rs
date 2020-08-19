@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::ffi::OsString;
 
 fn scan(path:PathBuf) -> io::Result<Vec<PathBuf>> {
-    let mut entr = fs::read_dir(&path)?
+    let entr = fs::read_dir(&path)?
         .map(|res|res.map(|e|e.path()))
         .collect::<Result<Vec<_>,io::Error>>()?;
 
@@ -56,7 +56,7 @@ fn read() -> PathBuf{
     let mut a = String::new();
     io::stdin().read_line(&mut a)
         .expect("location error");
-    let a = &a[..a.len()-1];
+    let a = &a[..a.len()-2];
     let a = PathBuf::from(a);
 a
 }
