@@ -3,14 +3,14 @@ use std::path::PathBuf;
 use std::ffi::OsString;
 use std::io::Result as IOResult;
 
-fn scan(path:PathBuf) -> IOResult<Vec<PathBuf>> {
+fn scan(path:PathBuf) -> IOResult<Vec<PathBuf>> {   
     let entr = fs::read_dir(&path)?
         .map(|res|res.map(|e|e.path()))
         .collect::<Result<Vec<_>,io::Error>>()?;
 
     Ok(entr)
 }
-fn change(a:IOResult<Vec<PathBuf>>) -> Vec<String>{
+fn change(a:IOResult<Vec<PathBuf>>) -> Vec<String>{     //PathBuf to String
     let a = a
             .unwrap()
             .into_iter()
@@ -20,7 +20,7 @@ fn change(a:IOResult<Vec<PathBuf>>) -> Vec<String>{
             .unwrap();
 a
 }
-fn get_size(a:&IOResult<Vec<PathBuf>>) ->Vec<u64>{
+fn get_size(a:&IOResult<Vec<PathBuf>>) ->Vec<u64>{      //get file size
     let a = a.as_ref().unwrap();
     let mut z = Vec::new();
     for (i,j) in a.iter().enumerate(){
@@ -40,16 +40,16 @@ fn do_match<T: PartialEq>(a: &Vec<T>, b: &Vec<T>) -> bool{
         .count();
     matching == a.len() && matching == b.len()
 }
-fn matching<T:PartialEq,U:PartialEq>(a:&Vec<T>, b:&Vec<T>,c:&Vec<U>,d:&Vec<U>) -> bool{
+fn matching<T:PartialEq,U:PartialEq>(a:&Vec<T>, b:&Vec<T>,c:&Vec<U>,d:&Vec<U>) -> bool{  //match file name
     let q = do_match(a, b);
     let p = do_match(c, d);
     q && p 
 }
 fn checking(a:&Vec<String>,b:&Vec<String>,c:&Vec<u64>,d:&Vec<u64>) {
    let x = check1(a,b);
-   if x.len() ==0 {
+   if x.len() == 0 {
        let y = check2(c,d);
-       if y.len() ==0 {
+       if y.len() == 0 {
            println!("it is same");
        }
    }
@@ -100,11 +100,11 @@ fn started() -> (Vec<String>,Vec<u64>) {
     let a = change(a);
     (a,a_size)
 }
-fn read() -> PathBuf{
+fn read() -> PathBuf{       
     let mut a = String::new();
     io::stdin().read_line(&mut a)
         .expect("location error");
-    let a = &a[..a.len()-1];
+    let a = &a[..a.len()-2];
     let a = PathBuf::from(a);
 a
 }
