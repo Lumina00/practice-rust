@@ -1,7 +1,9 @@
-use std::{fs,io};
+use std::{fs,env,io};
 use std::path::PathBuf;
+use std::io::Result as IOResult;
 
-fn replace(a:PathBuf,b:PathBuf) {
+
+fn replace(a:PathBuf,b:PathBuf,a_files:Vec<PathBuf>,b_files:Vec<PathBuf>) {
     let mut temp = b
         .clone()
         .into_os_string()
@@ -19,19 +21,27 @@ fn replace(a:PathBuf,b:PathBuf) {
         .expect("Permission Denied");
     
 }
-fn read() -> PathBuf{
-    let mut a = String::new();
-    io::stdin().read_line(&mut a)
-        .expect("location error");
-    let a = &a[..a.len()-2];
+fn readdir(path:PathBuf) ->IOResult<Vec<PathBuf>> {
+    let entr = fs::read_dir(&path)?
+        .map(|res|res.map(|e|e.path()))
+        .collect::<Result<Vec<_>,io::Error>>()?;
+    Ok(entr)
+
+}
+fn start(a:&String) -> (PathBuf,Vec<PathBuf>){
     let a = PathBuf::from(a);
-a
+    if a.is_file() == true {
+
+    }
+
+    let b = readdir(a.clone()).unwrap();
+
+(a,b)
 }
 fn main(){
-
-    let path1 = read();
-    let path2 = read();
+    let args: Vec<String> = env::args().collect();
+    let path1 = start(&args[1]);
+    let path2 = start(&args[2]);
     
-    replace(path1,path2);
-
+    replace(path1.0,path2.0,path1.1,path2.1);
 }
