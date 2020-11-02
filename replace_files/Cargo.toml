@@ -1,6 +1,6 @@
 [package]
 name = "replace_files"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["lumina.static@gmail.com"]
 edition = "2018"
 
