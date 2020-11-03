@@ -5,24 +5,17 @@ use std::io::Result as IOResult;
 fn replace_file(a:PathBuf,b:PathBuf) {
     let mut temp = b
         .clone()
-        .into_os_string()
-        .into_string()
-        .unwrap();
-    temp.push_str(".tmp");
+        .join(".tmp");
     let temp = PathBuf::from(temp);
     fs::copy(&a,&temp);
     fs::remove_file(&a);
     fs::copy(&b,&a);
     fs::rename(&temp,&a);
-    
 }
 fn replace_dir(a:PathBuf,b:PathBuf,a_files:Vec<PathBuf>,b_files:Vec<PathBuf>) {
     let mut temp = a
         .clone()
-        .join(".tmp")
-        .into_os_string()
-        .into_string()
-        .unwrap();
+        .join(".tmp");
     fs::create_dir(&temp);
     for x in 0..a_files.len(){
         let c = a_files.get(x).unwrap();
