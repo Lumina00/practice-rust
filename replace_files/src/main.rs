@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::io::Result as IOResult;
 
 fn replace_file(a:PathBuf,b:PathBuf) {
-    let mut temp = b
+    let temp = b
         .clone()
         .join(".tmp");
     let temp = PathBuf::from(temp);
@@ -13,7 +13,7 @@ fn replace_file(a:PathBuf,b:PathBuf) {
     fs::rename(&temp,&a);
 }
 fn replace_dir(a:PathBuf,b:PathBuf,a_files:Vec<PathBuf>,b_files:Vec<PathBuf>) {
-    let mut temp = a
+    let temp = a
         .clone()
         .join(".tmp");
     fs::create_dir(&temp);
@@ -49,7 +49,7 @@ fn main(){
     let path2 = start(&args[2]);
     if path1.0.is_file() == true || path2.0.is_file() == true {
         replace_file(path1.0,path2.0);
-    } else {
+    } else if path1.0.is_dir() == true || path2.0.is_dir() == true {
         replace_dir(path1.0,path2.0,path1.1,path2.1);
     }
 }
