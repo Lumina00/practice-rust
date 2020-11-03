@@ -16,7 +16,10 @@ fn main() {
         .open().unwrap();
     let mut packet = cap.next().unwrap();
     let header = packet.header;
+    let data = packet.data;
     let timestamp = header.ts.tv_sec;
+    let caplen = header.caplen;
+    let len = header.len;
     let mut tm:*mut libc::tm;
     let mut time:Times;
     unsafe { 
@@ -34,7 +37,26 @@ fn main() {
         time = _time;
 
     }
+    let mut time_wday:&str;
+    match &time.time_wday {
+        0=>time_wday="Sun",
+        1=>time_wday="Mon",
+        3=>time_wday="Tue",
+        4=>time_wday="Wed",
+        5=>time_wday="Thu",
+        6=>time_wday="Fri",
+        7=>time_wday="Sat",
+        _=>println!("Something seems wrong"),
+    };
+    
+    //println!("________________________________________");
+    //println!("{}-{}-{}-{}-{}:{}:{}",time.time_y,time.time_m,time.time_wday,time.time_d,time.time_h,time.time_min,time.time_sec);
+    //println!("Size = {} {}",len,caplen);
+    //println!("Data = {:?}",data);
+    println!("{:?}",data); 
 
-    println!("{}-{}-{}-{}-{}:{}:{}",time.time_y,time.time_m,time.time_wday,time.time_d,time.time_h,time.time_min,time.time_sec);
+
+
 }
+
 
