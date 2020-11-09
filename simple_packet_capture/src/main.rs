@@ -1,4 +1,10 @@
 use pcap::{Device,Capture};
+
+trait Summarizable {
+    fn summary(&self);
+    fn w_wday(&self) -> &str;
+}
+
 struct Times {
     time_y: i32,
     time_m: i32,
@@ -7,6 +13,26 @@ struct Times {
     time_h: i32,
     time_min: i32,
     time_sec: i32,
+}
+impl Summarizable for Times {
+    fn summary(&self) {
+    format!("{}-{}-{}-{}-{}:{}:{}",self.time_y,self.time_m,self.w_wday(),self.time_d,self.time_h,self.time_min,self.time_sec);
+    }
+    fn w_wday(&self) -> &str {
+        let mut wday:&str;
+        match self.time_wday {
+            0=>wday="Sun",
+            1=>wday="Mon",
+            3=>wday="Tue",
+            4=>wday="Wed",
+            5=>wday="Thu",
+            6=>wday="Fri",
+            7=>wday="Sat",
+            _=>panic!("Something seems wrong"),
+        
+            };
+wday
+    }
 }
 fn main() {
     let maindevice = Device::lookup().unwrap();
@@ -37,25 +63,12 @@ fn main() {
         time = _time;
 
     }
-    let mut time_wday:&str;
-    match &time.time_wday {
-        0=>time_wday="Sun",
-        1=>time_wday="Mon",
-        3=>time_wday="Tue",
-        4=>time_wday="Wed",
-        5=>time_wday="Thu",
-        6=>time_wday="Fri",
-        7=>time_wday="Sat",
-        _=>println!("Something seems wrong"),
-    };
     
     //println!("________________________________________");
-    //println!("{}-{}-{}-{}-{}:{}:{}",time.time_y,time.time_m,time.time_wday,time.time_d,time.time_h,time.time_min,time.time_sec);
+    //println!("{}",time.summary);
     //println!("Size = {} {}",len,caplen);
     //println!("Data = {:?}",data);
     println!("{:?}",data); 
-
-
 
 }
 
