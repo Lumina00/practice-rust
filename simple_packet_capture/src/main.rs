@@ -16,10 +16,10 @@ struct Times {
 }
 impl Summarizable for Times {
     fn summary(&self){
-    println!("{}-{}-{}-{}-{}:{}:{}",self.time_y,self.time_m,self.w_wday(),self.time_d,self.time_h,self.time_min,self.time_sec);
+    println!("{}-{}-{}-{} {}:{}:{}",self.time_y,self.time_m,self.time_d,self.w_wday(),self.time_h,self.time_min,self.time_sec);
     }
     fn w_wday(&self) -> &str {
-        let mut wday:&str = "S";
+        let mut wday:&str;
         match self.time_wday {
             0=>wday="Sun",
             1=>wday="Mon",

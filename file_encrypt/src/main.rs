@@ -1,6 +1,7 @@
 use ring::{pbkdf2,digest,rand::{self,SecureRandom}};
-use std::{num::NonZeroU32, collections::HashMap,fs};
-use std::{io::{self,prelude::*}};
+use std::num::NonZeroU32;
+use std::{fs,env,str};
+use std::{io::{stdin,prelude::*},path::PathBuf};
 mod crypto;
 use crypto::*;
 
@@ -11,7 +12,7 @@ struct PasswordDB {
     pbkdf2_interations: NonZeroU32,
 }
 impl PasswordDB {
-    pub fn store_password(&mut self, password:&str,salt:&Vec<u8>){
+    pub fn store_password(&mut self, password:&str,salt:&Vec<u8>)->Credential{
         let mut to_store: Credential = [0u8;CREDENTIAL_LEN];
         pbkdf2::derive(
             PBKDF2_ALG,
@@ -19,23 +20,25 @@ impl PasswordDB {
             &salt, 
             password.as_bytes(), 
             &mut to_store);
+        println!("{:?}",&to_store);
+        to_store
     }
-    fn verify_password(&mut self, password:&str,salt:&Vec<u8>){
-        let mut to_verify: Credential = [0u8;CREDENTIAL_LEN];
-            pbkdf2::verify(
-                PBKDF2_ALG,
-                self.pbkdf2_interations,
-                &salt, 
-                password.as_bytes(),
-                &mut to_verify);
+    pub fn verify_password(&mut self, password:&str,salt:&Vec<u8>,to_verify:&mut Vec<u8>){
+        let qwe = pbkdf2::verify(
+            PBKDF2_ALG,
+            self.pbkdf2_interations,
+            &salt, 
+            password.as_bytes(),
+            to_verify);
+        println!("{:?}",qwe);
     }
 }
-
 fn salt() -> Vec<u8> {
     let rng = rand::SystemRandom::new();
     let mut salt = [0u8; CREDENTIAL_LEN];
     rng.fill(&mut salt)
         .expect("Err to generate salt");
+    println!("{:?}",salt.clone());
     salt.to_vec()
 }
 fn store(){
@@ -43,35 +46,52 @@ fn store(){
         pbkdf2_interations: NonZeroU32::new(100_000).unwrap(),
     };
     let mut password =String::new();
-    io::stdin().read_line(&mut password)
+    stdin().read_line(&mut password)
         .expect("Err to read_line");
     let salt = salt();
-    db.store_password(&password,&salt);
-    let mut file = fs::File::create("salt")
+    let store = db.store_password(&password,&salt);
+    let mut file_salt = fs::File::create("salt")
         .expect("can not create file");
-   
-    for i in 0..salt.len(){
-        let buf = salt.get(i).unwrap();
-        write!(file,"{}",buf);
-    }
+    let mut file_store = fs::File::create("store")
+        .expect("can not create file");
+    let salt:&[u8] = &salt;
+    let store:&[u8] = &store;
+        unsafe {
+            let buf = str::from_utf8_unchecked(salt);
+            write!(file_salt,"{}",buf)
+                .expect("Err to Write");
+            let buf = str::from_utf8_unchecked(store);
+            write!(file_store,"{}",buf)
+                .expect("Err to Write");
+
+
+        }
 }
-fn verify() {
-    let salt = open_file();
+fn verify(salt:&str,store:&str) {
+    let salt = open_file(salt);
+    let mut store = open_file(store);
     let mut db = PasswordDB {
         pbkdf2_interations: NonZeroU32::new(100_000).unwrap(),
     };
-    let mut password =String::new();
-    io::stdin().read_line(&mut password)
+    let mut password = String::new();
+    stdin().read_line(&mut password)
         .expect("Err to read_line");
-    db.verify_password(&password,&salt);
-
+    let qwe = db.verify_password(&password,&salt,&mut store);
 }
-fn open_file() -> Vec<u8>{
-    let file = fs::open();
-    let salt = fs::read(file).unwrap();
+fn open_file(file:&str) -> Vec<u8>{
+    let file = PathBuf::from(file);
+    let mut file = fs::File::open(file)
+        .expect("Err to open file");
+    let mut salt = Vec::new();
+        file.read_to_end(&mut salt).unwrap();
+    println!("{:?}",&salt);
 salt
 }
-
 fn main(){
-    store();
+    let args: Vec<String> = env::args().collect();
+    if args[1] == "-s".to_string(){
+        verify(&args[2],&args[3]);
+        }
+    else if args[1] == "-n".to_string(){
+    store();}
 }
