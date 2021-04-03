@@ -21,7 +21,7 @@ impl PasswordDB {
         to_store
     }
     pub fn verify_password(&mut self, password:&str,salt:&Vec<u8>,to_verify:&mut Vec<u8>){
-        let qwe = pbkdf2::verify(
+        let _ = pbkdf2::verify(
             PBKDF2_ALG,
             self.pbkdf2_interations,
             &salt, 
@@ -69,7 +69,7 @@ pub fn verify(salt:&str,store:&str) {
     let mut password = String::new();
     stdin().read_line(&mut password)
         .expect("Err to read_line");
-    let qwe = db.verify_password(&password,&salt,&mut store);
+    let _ = db.verify_password(&password,&salt,&mut store);
 }
 pub fn open_file(file:&str) -> Vec<u8>{
     let file = PathBuf::from(file);
